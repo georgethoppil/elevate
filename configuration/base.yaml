@@ -1,0 +1,9 @@
+application:
+  port: 8080
+redis:
+  port: 6379
+database:
+  port: 5432
+  username: "postgres"
+  password: "password"
+  database_name: "elevate"
