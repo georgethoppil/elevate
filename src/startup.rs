@@ -1,7 +1,5 @@
-use std::sync::Arc;
-
 use crate::AppState;
-use crate::RedisDatabase;
+use crate::RedisPool;
 use crate::{health_check, Configuration};
 use axum::{routing::get, Router};
 use sqlx::postgres::PgPoolOptions;
@@ -19,17 +17,17 @@ impl Application {
 
     pub async fn run(self) -> Result<(), std::io::Error> {
         // set up db pool
-        let connection_pool = PgPoolOptions::new()
+        let db_pool = PgPoolOptions::new()
             .acquire_timeout(std::time::Duration::from_secs(2))
             .connect_lazy_with(self.config.database.with_db());
 
         // redis
-        let redis_database = RedisDatabase::new(self.config.redis.connection_string()).await;
+        let redis_pool = RedisPool::new(self.config.redis.connection_string()).await;
 
         // app_state
         let app_state = AppState {
-            redis_database,
-            db_pool: Arc::new(connection_pool),
+            redis_pool,
+            db_pool,
         };
 
         // tcp listener

@@ -4,13 +4,10 @@ use bb8_redis::RedisConnectionManager;
 use redis::AsyncCommands;
 
 #[derive(Clone)]
-pub struct RedisDatabase {
-    redis_pool: Pool<RedisConnectionManager>,
-}
+pub struct RedisPool;
 
-impl RedisDatabase {
-    pub async fn new(addr: String) -> Self {
-        //redis
+impl RedisPool {
+    pub async fn new(addr: String) -> Pool<RedisConnectionManager> {
         tracing::debug!("connecting to redis");
         let manager = RedisConnectionManager::new(addr).unwrap();
         let redis_pool = bb8::Pool::builder().build(manager).await.unwrap();
@@ -24,6 +21,6 @@ impl RedisDatabase {
         }
 
         tracing::debug!("successfully connected to redis and pinged it");
-        RedisDatabase { redis_pool }
+        redis_pool
     }
 }
