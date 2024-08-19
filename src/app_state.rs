@@ -1,12 +1,10 @@
-use std::sync::Arc;
-
+use bb8::Pool;
+use bb8_redis::bb8;
+use bb8_redis::RedisConnectionManager;
 use sqlx::PgPool;
 
-use crate::RedisDatabase;
-
 #[derive(Clone)]
-
 pub struct AppState {
-    pub redis_database: RedisDatabase,
-    pub db_pool: Arc<PgPool>,
+    pub redis_pool: Pool<RedisConnectionManager>,
+    pub db_pool: PgPool,
 }
