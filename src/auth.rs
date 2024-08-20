@@ -91,3 +91,5 @@ impl AuthnBackend for Backend {
         Ok(user)
     }
 }
+
+pub type AuthSession = axum_login::AuthSession<Backend>;
