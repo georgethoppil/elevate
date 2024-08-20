@@ -2,6 +2,8 @@ application:
   port: 8080
 redis:
   port: 6379
+  secure: false
+  expiry_duration: 60
 database:
   port: 5432
   username: "postgres"

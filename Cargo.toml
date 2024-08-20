@@ -15,8 +15,6 @@ axum = "0.7.5"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.38.1", features = ["macros", "rt-multi-thread"] }
 config = "0.13"
-bb8 = "0.7.1"
-bb8-redis = "0.14.0"
 redis = "0.24.0"
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
@@ -24,10 +22,12 @@ secrecy = { version = "0.8", features = ["serde"] }
 serde-aux = "3"
 uuid = { version = "1", features = ["v4"] }
 
-[dev-dependencies]
-reqwest = "0.11"
+tower-sessions-core = "0.12.3"
+tower-sessions-redis-store = "0.13.0"
+tower-sessions = "0.12.3"
 tower = { version = "0.4", features = ["util"] }
-
+reqwest = "0.11"
+axum-login = "0.15.3"
 
 [dependencies.sqlx]
 version = "0.6.2"

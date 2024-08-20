@@ -17,6 +17,8 @@ pub struct RedisConfiguration {
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
+    pub secure: bool,
+    pub expiry_duration: i64,
 }
 
 impl RedisConfiguration {

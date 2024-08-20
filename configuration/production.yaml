@@ -2,6 +2,8 @@ application:
   host: 0.0.0.0
 redis:
   host: 0.0.0.0
+  secure: true
+  expiry: 3600
 database:
   host: 0.0.0.0
-  require_ssl: false
+  require_ssl: true
