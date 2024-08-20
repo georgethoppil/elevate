@@ -1,15 +1,12 @@
-use axum::{
-    extract::State,
-    http::StatusCode,
-    response::{IntoResponse, Redirect},
-    Json,
-};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum_macros::debug_handler;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{AuthSession, Credentials};
 
-pub async fn login(
+#[debug_handler]
+pub async fn login_handler(
     mut auth_session: AuthSession,
     Json(creds): Json<Credentials>,
 ) -> impl IntoResponse {
@@ -19,7 +16,10 @@ pub async fn login(
             tracing::debug!("invalid creds");
             return StatusCode::UNAUTHORIZED.into_response();
         }
-        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+        Err(e) => {
+            tracing::debug!("{}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+        }
     };
 
     if auth_session.login(&user).await.is_err() {
@@ -27,28 +27,33 @@ pub async fn login(
     }
 
     tracing::debug!("Successfully logged in as {}", user.email);
-
-    return Redirect::to("/").into_response();
+    StatusCode::OK.into_response()
 }
-
-pub async fn signup(
+#[debug_handler]
+pub async fn signup_handler(
+    State(db_pool): State<PgPool>,
     Json(creds): Json<Credentials>,
-    State(pool): State<PgPool>,
 ) -> impl IntoResponse {
     let user_id = Uuid::new_v4();
     let password_hash = password_auth::generate_hash(creds.password);
 
-    // let result = sqlx::query!(
-    //     r#"
-    //     INSERT INTO users (email, password_hash)
-    //     VALUES ($1, $2)
-    //     RETURNING id
-    //     "#,
-    //     creds.email,
-    //     password_hash,
-    // )
-    // .fetch_one(&pool)
-    // .await;
+    let result = sqlx::query!(
+        r#"
+        INSERT INTO users (user_id, email, password)
+        VALUES ($1, $2, $3)
+        "#,
+        user_id,
+        creds.email,
+        password_hash,
+    )
+    .execute(&db_pool)
+    .await;
 
-    return StatusCode::CREATED;
+    match result {
+        Ok(_) => StatusCode::CREATED.into_response(),
+        Err(e) => {
+            tracing::debug!("error creating user {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
 }

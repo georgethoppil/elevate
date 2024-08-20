@@ -1,5 +1,6 @@
-use crate::{health_check, Configuration};
+use crate::{health_check, login_handler, signup_handler, Configuration};
 use crate::{AppState, Backend};
+use axum::routing::post;
 use axum::{routing::get, Router};
 use axum_login::{login_required, AuthManagerLayerBuilder};
 use sqlx::postgres::PgPoolOptions;
@@ -58,11 +59,13 @@ impl Application {
         .await?;
 
         // router
+
         let app = Router::new()
             .route("/health_check", get(health_check))
-            // .route_layer(login_required!(Backend, login_url = "/login"))
+            .route("/api/user", post(signup_handler)) // Signup route
+            .route("/api/sessions", post(login_handler)) // Login route
             .layer(auth_layer)
-            .with_state(app_state);
+            .with_state(app_state.db_pool);
 
         // serve
         axum::serve(listener, app).await?;
