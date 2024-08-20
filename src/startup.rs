@@ -1,6 +1,7 @@
-use crate::AppState;
 use crate::{health_check, Configuration};
+use crate::{AppState, Backend};
 use axum::{routing::get, Router};
+use axum_login::{login_required, AuthManagerLayerBuilder};
 use sqlx::postgres::PgPoolOptions;
 
 use tower_sessions::cookie::time::Duration;
@@ -39,6 +40,10 @@ impl Application {
                 self.config.redis.expiry_duration,
             )));
 
+        // auth service
+        let backend = Backend::new(db_pool.clone());
+        let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
+
         // app_state
         let app_state = AppState {
             redis_pool,
@@ -55,6 +60,8 @@ impl Application {
         // router
         let app = Router::new()
             .route("/health_check", get(health_check))
+            // .route_layer(login_required!(Backend, login_url = "/login"))
+            .layer(auth_layer)
             .with_state(app_state);
 
         // serve
