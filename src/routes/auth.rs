@@ -10,7 +10,6 @@ pub async fn login_handler(
     mut auth_session: AuthSession,
     Json(creds): Json<Credentials>,
 ) -> impl IntoResponse {
-    tracing::debug!("enteringgg");
     let user = match auth_session.authenticate(creds.clone()).await {
         Ok(Some(user)) => user,
         Ok(None) => {
@@ -51,7 +50,10 @@ pub async fn signup_handler(
     .await;
 
     match result {
-        Ok(_) => StatusCode::CREATED.into_response(),
+        Ok(_) => {
+            tracing::debug!("created user {}", creds.email);
+            return StatusCode::CREATED.into_response();
+        }
         Err(e) => {
             tracing::debug!("error creating user {}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()

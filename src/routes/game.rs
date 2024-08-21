@@ -53,7 +53,10 @@ pub async fn game_event_handler(
             .await;
 
             match result {
-                Ok(_) => StatusCode::OK.into_response(),
+                Ok(_) => {
+                    tracing::debug!("inserted game event for {}", user.email);
+                    return StatusCode::OK.into_response();
+                }
                 Err(e) => {
                     tracing::debug!("Error inserting game: {:?}", e);
                     StatusCode::INTERNAL_SERVER_ERROR.into_response()
