@@ -10,7 +10,7 @@ use uuid::Uuid;
 pub struct User {
     pub user_id: Uuid,
     pub email: String,
-    password: String,
+    pub password: String,
 }
 
 impl std::fmt::Debug for User {
@@ -35,7 +35,7 @@ impl AuthUser for User {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct Credentials {
     pub email: String,
     pub password: String,

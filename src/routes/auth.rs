@@ -10,6 +10,7 @@ pub async fn login_handler(
     mut auth_session: AuthSession,
     Json(creds): Json<Credentials>,
 ) -> impl IntoResponse {
+    tracing::debug!("enteringgg");
     let user = match auth_session.authenticate(creds.clone()).await {
         Ok(Some(user)) => user,
         Ok(None) => {
