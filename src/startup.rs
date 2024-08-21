@@ -19,13 +19,13 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn build(configuration: Configuration) -> Self {
+    pub fn new(configuration: Configuration) -> Self {
         Application {
             config: configuration,
         }
     }
 
-    pub async fn run(self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn build(self) -> Result<Router, Box<dyn std::error::Error>> {
         // set up db pool
         let db_pool = PgPoolOptions::new()
             .acquire_timeout(std::time::Duration::from_secs(2))
@@ -56,13 +56,6 @@ impl Application {
             db_pool,
         };
 
-        // tcp listener
-        let listener = tokio::net::TcpListener::bind(format!(
-            "{}:{}",
-            self.config.application.host, self.config.application.port
-        ))
-        .await?;
-
         // router
         let app = Router::new()
             .route("/api/user", get(game_summary_handler)) // Game summary
@@ -73,8 +66,6 @@ impl Application {
             .layer(auth_layer)
             .with_state(app_state.db_pool);
 
-        // serve
-        axum::serve(listener, app).await?;
-        Ok(())
+        Ok(app)
     }
 }

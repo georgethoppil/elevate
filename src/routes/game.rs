@@ -13,21 +13,21 @@ pub struct GamePayload {
     pub occurred_at: DateTime<Utc>,
 }
 
-#[derive(Serialize)]
-struct UserStats {
-    total_games_played: i64,
+#[derive(Serialize, Deserialize)]
+pub struct UserStats {
+    pub total_games_played: i64,
 }
 
-#[derive(Serialize)]
-struct UserResponse {
+#[derive(Serialize, Deserialize)]
+pub struct UserResponse {
     id: Uuid,
     email: String,
-    stats: UserStats,
+    pub stats: UserStats,
 }
 
-#[derive(Serialize)]
-struct ResponseBody {
-    user: UserResponse,
+#[derive(Serialize, Deserialize)]
+pub struct ResponseBody {
+    pub user: UserResponse,
 }
 
 #[debug_handler]
