@@ -13,5 +13,40 @@
       }
     },
     "query": "\n        INSERT INTO users (user_id, email, password)\n        VALUES ($1, $2, $3)\n        "
+  },
+  "b90d0c472d170f8e20f5aa48eb6bf495d58f8851f67976627728bfa7a287d20e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Uuid",
+          "Text",
+          "Timestamp"
+        ]
+      }
+    },
+    "query": "\n                INSERT INTO games (game_id, user_id, type, occurred_at)\n                VALUES ($1, $2, $3, $4)\n                "
+  },
+  "c0d304486425637fe681a36f883e2081b5bf43782690c11b1670330a4e97962a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "SELECT COUNT(game_id) FROM games WHERE user_id = $1"
   }
 }

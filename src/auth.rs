@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 #[derive(Clone, Deserialize, FromRow)]
 pub struct User {
-    user_id: Uuid,
+    pub user_id: Uuid,
     pub email: String,
     password: String,
 }
@@ -83,7 +83,7 @@ impl AuthnBackend for Backend {
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
-        let user = sqlx::query_as("select * from users where id = $1")
+        let user = sqlx::query_as("select * from users where user_id = $1")
             .bind(user_id)
             .fetch_optional(&self.db)
             .await?;
