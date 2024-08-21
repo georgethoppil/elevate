@@ -1,4 +1,6 @@
-use crate::{health_check, login_handler, signup_handler, Configuration};
+use crate::{
+    game_event_handler, game_summary_handler, login_handler, signup_handler, Configuration,
+};
 use crate::{AppState, Backend};
 use axum::routing::post;
 use axum::{routing::get, Router};
@@ -6,6 +8,7 @@ use axum_login::{login_required, AuthManagerLayerBuilder};
 use sqlx::postgres::PgPoolOptions;
 
 use tower_sessions::cookie::time::Duration;
+use tower_sessions::cookie::Key;
 use tower_sessions::{Expiry, SessionManagerLayer};
 use tower_sessions_redis_store::fred::prelude::{ClientLike, RedisPool};
 use tower_sessions_redis_store::fred::types::RedisConfig;
@@ -35,11 +38,13 @@ impl Application {
         let redis_store = RedisStore::new(redis_pool.clone());
 
         // sessions
+        let key = Key::generate();
         let session_layer = SessionManagerLayer::new(redis_store)
             .with_secure(self.config.redis.secure)
             .with_expiry(Expiry::OnInactivity(Duration::seconds(
                 self.config.redis.expiry_duration,
-            )));
+            )))
+            .with_signed(key);
 
         // auth service
         let backend = Backend::new(db_pool.clone());
@@ -59,9 +64,10 @@ impl Application {
         .await?;
 
         // router
-
         let app = Router::new()
-            .route("/health_check", get(health_check))
+            .route("/api/user", get(game_summary_handler)) // Game summary
+            .route("/api/user/game_events", post(game_event_handler)) // Game event route
+            .route_layer(login_required!(Backend))
             .route("/api/user", post(signup_handler)) // Signup route
             .route("/api/sessions", post(login_handler)) // Login route
             .layer(auth_layer)

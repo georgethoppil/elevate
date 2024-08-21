@@ -24,13 +24,17 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 tower-sessions-core = "0.12.3"
 tower-sessions-redis-store = "0.13.0"
-tower-sessions = "0.12.3"
+tower-sessions = { version = "0.12.3", default-features = false, features = [
+    "signed",
+] }
 tower = { version = "0.4", features = ["util"] }
 reqwest = "0.11"
 axum-login = "0.15.3"
 thiserror = "1.0.63"
 password-auth = "1.0.0"
 axum-macros = "0.4.1"
+chrono = { version = "0.4", features = ["serde"] }
+
 
 [dependencies.sqlx]
 version = "0.6.2"
